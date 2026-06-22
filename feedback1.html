@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: radial-gradient(circle at center, #1a1535, #0b1020, #020617);
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden; /* Disables page scrolling entirely */
+        }
+
+        /* CARD CONTAINER */
+        .feedback-card {
+            width: min(750px, 95%);
+            background: rgba(255, 255, 255, .05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 32px;
+            padding: 40px;
+            text-align: center;
+            max-height: 95vh;
+            overflow-y: auto; /* Internal scrolling allowed only for the form if screens are small */
+        }
+
+        /* Minimal scrollbar for form container */
+        .feedback-card::-webkit-scrollbar {
+            width: 6px;
+        }
+        .feedback-card::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+        }
+
+        .title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            color: white;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .subtitle {
+            color: #cbd5e1;
+            margin-top: 10px;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+
+        /* STARS */
+        .rating {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .star {
+            font-size: 2.5rem;
+            cursor: pointer;
+            filter: grayscale(100%);
+            transition: .3s;
+        }
+
+        .star.active {
+            filter: none;
+            transform: scale(1.15);
+        }
+
+        /* OPTIONS */
+        .section {
+            margin-top: 25px;
+        }
+
+        .section h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+            font-weight: 500;
+        }
+
+        .options {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 10px 22px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, .08);
+            color: white;
+            cursor: pointer;
+            transition: .3s;
+            font-size: 0.9rem;
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+        }
+
+        /* MESSAGE BOX */
+        textarea {
+            margin-top: 25px;
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: none;
+            outline: none;
+            resize: none;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, .08);
+            color: white;
+            font-family: inherit;
+        }
+
+        /* BUTTON */
+        .submit-btn {
+            margin-top: 30px;
+            padding: 16px 38px;
+            border: none;
+            border-radius: 999px;
+            cursor: pointer;
+            color: white;
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            transition: .4s;
+            font-size: 1rem;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px) scale(1.03);
+        }
+
+        /* GOODBYE SECTION - Perfectly Centered & No-Scroll */
+        #goodbye {
+            display: none;
+            text-align: center;
+            max-width: 650px;
+            width: 90%;
+        }
+
+        #goodbye h1 {
+            color: white;
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 20px;
+        }
+
+        #goodbye p {
+            color: #cbd5e1;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            line-height: 1.8;
+        }
+
+        .heart {
+            font-size: 4rem;
+            margin-top: 25px;
+            animation: beat 1.2s infinite;
+            display: inline-block;
+        }
+
+        @keyframes beat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .memory-book-btn{
+
+    margin-top:40px;
+
+    padding:18px 40px;
+
+    border:none;
+
+    border-radius:999px;
+
+    cursor:pointer;
+
+    font-size:1rem;
+
+    color:white;
+
+    background:
+    linear-gradient(
+        135deg,
+        #ec4899,
+        #8b5cf6
+    );
+
+    transition:.4s;
+}
+
+.memory-book-btn:hover{
+
+    transform:
+    translateY(-5px)
+    scale(1.05);
+
+}
+    </style>
+</head>
+
+<body>
+
+    <!-- FEEDBACK FORM CARD -->
+    <div class="feedback-card" id="feedbackCard">
+        <h1 class="title">One Last Thing...</h1>
+        <p class="subtitle">How did this little birthday journey make you feel?</p>
+
+        <div class="rating">
+            <span class="star">⭐</span>
+            <span class="star">⭐</span>
+            <span class="star">⭐</span>
+            <span class="star">⭐</span>
+            <span class="star">⭐</span>
+        </div>
+
+        <div class="section">
+            <h3>Favorite Page?</h3>
+            <div class="options" id="favoritePages">
+                <div class="option">Birthday Reveal</div>
+                <div class="option">Why You're Special</div>
+                <div class="option">Memory Lane</div>
+                <div class="option">Letter</div>
+                <div class="option">Wish</div>
+                <div class="option">Secret</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Did It Make You Smile? 😊</h3>
+            <div class="options" id="smileOptions">
+                <div class="option">A Little 🙂</div>
+                <div class="option">Yes 😊</div>
+                <div class="option">A Lot 😆</div>
+            </div>
+        </div>
+
+        <textarea id="message" placeholder="Leave a message for me... 💌"></textarea>
+
+        <button class="submit-btn" id="submitBtn">💜 Send Feedback</button>
+    </div>
+
+    <!-- FINAL GOODBYE ENDPAGE -->
+    <div id="goodbye">
+        <h1>The Website Ends Here...</h1>
+        <p>
+            But the memories don't.<br><br>
+            Thank you for spending a part of your birthday here.<br>
+            I hope this little surprise made your day brighter.<br><br>
+            <strong>Happy Birthday ❤️</strong>
+        </p>
+        <div class="heart">💖</div>
+        <button id="memoryBookBtn" class="memory-book-btn">
+
+    📖 Open Memory Book
+
+</button>
+    </div>
+
+    <script>
+        /* STAR RATING */
+        const stars = document.querySelectorAll(".star");
+        let rating = 0;
+
+        stars.forEach((star, index) => {
+            star.addEventListener("click", () => {
+                rating = index + 1;
+                stars.forEach((s, i) => {
+                    if (i <= index) {
+                        s.classList.add("active");
+                    } else {
+                        s.classList.remove("active");
+                    }
+                });
+            });
+        });
+
+        /* OPTIONS SELECTION */
+        document.querySelectorAll(".options").forEach(group => {
+            group.querySelectorAll(".option").forEach(option => {
+                option.addEventListener("click", () => {
+                    group.querySelectorAll(".option").forEach(o => o.classList.remove("selected"));
+                    option.classList.add("selected");
+                });
+            });
+        });
+
+        /* SUBMIT SUBMISSION FORM */
+        document.getElementById("submitBtn").addEventListener("click", () => {
+            const feedback = {
+                rating,
+                message: document.getElementById("message").value
+            };
+
+            localStorage.setItem("birthdayFeedback", JSON.stringify(feedback));
+
+            // Celebration effect
+            confetti({
+                particleCount: 200,
+                spread: 120
+            });
+
+            // Smooth transition away from the form card
+            gsap.to("#feedbackCard", {
+                opacity: 0,
+                scale: 0.95,
+                duration: 0.8,
+                onComplete: () => {
+                    document.getElementById("feedbackCard").style.display = "none";
+                    document.getElementById("goodbye").style.display = "block";
+
+                    // Smooth entry for the fixed goodbye page
+                    gsap.fromTo("#goodbye", 
+                        { opacity: 0, scale: 0.9 },
+                        { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" }
+                    );
+                }
+            });
+        });
+        document
+.getElementById("memoryBookBtn")
+.addEventListener("click",()=>{
+
+    gsap.to("#goodbye",{
+
+        opacity:0,
+
+        duration:1,
+
+        onComplete:()=>{
+
+            window.location.href =
+            "finalgoodbye.html";
+
+        }
+
+    });
+
+});
+    </script>
+
+</body>
+</html>

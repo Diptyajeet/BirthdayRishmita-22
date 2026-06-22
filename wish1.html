@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make A Wish</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- GSAP CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            background: radial-gradient(circle at center, #1b1535, #0b1020, #020617);
+            height: 100vh;
+        }
+
+        /* INTRO */
+        #intro {
+            position: fixed;
+            inset: 0;
+            background: #020617;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        #introText {
+            color: white;
+            font-size: clamp(2rem, 5vw, 4rem);
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            line-height: 1.6;
+        }
+
+        /* SKY WORKSPACE */
+        #wishPage {
+            opacity: 0;
+            visibility: hidden;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        /* STARS */
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: twinkle infinite alternate;
+        }
+
+        @keyframes twinkle {
+            from { opacity: .2; }
+            to { opacity: 1; }
+        }
+
+        /* MOON */
+        .moon {
+            position: absolute;
+            top: 60px;
+            right: 8%;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #fff6cc;
+            box-shadow: 0 0 40px white, 0 0 80px rgba(255,255,255,.3);
+            z-index: 1;
+        }
+
+        /* WISH CARD */
+        .wish-card {
+            width: min(650px, 90%);
+            text-align: center;
+            padding: 50px;
+            border-radius: 40px;
+            background: rgba(255, 255, 255, .05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, .08);
+            z-index: 10;
+        }
+
+        .wish-card h1 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: clamp(2.2rem, 5vw, 3.5rem);
+            font-family: 'Playfair Display', serif;
+        }
+
+        .wish-card p {
+            color: #cbd5e1;
+            margin-bottom: 30px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 160px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            resize: none;
+            outline: none;
+            border-radius: 20px;
+            padding: 20px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, .06);
+            color: white;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            border-color: rgba(236, 72, 153, 0.5);
+        }
+
+        textarea::placeholder {
+            color: #94a3b8;
+        }
+
+        button {
+            margin-top: 30px;
+            border: none;
+            padding: 18px 45px;
+            border-radius: 999px;
+            cursor: pointer;
+            color: white;
+            font-weight: 500;
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(236, 72, 153, 0.35);
+        }
+
+        /* SHOOTING STAR */
+        .shooting-star {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 250px;
+            height: 2px;
+            background: linear-gradient(90deg, white, transparent);
+            opacity: 0;
+            transform: rotate(30deg); /* Realistic trajectory angle */
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        /* SUCCESS STATE */
+        #success {
+            display: none;
+            opacity: 0;
+            color: white;
+            text-align: center;
+            z-index: 10;
+            width: min(600px, 90%);
+        }
+
+        #success h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-family: 'Playfair Display', serif;
+        }
+
+        #success p {
+            margin-top: 20px;
+            color: #cbd5e1;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+<div id="intro">
+    <h1 id="introText">Close your eyes...<br><br>Make a wish...</h1>
+</div>
+
+<div id="wishPage">
+    <div class="moon"></div>
+    <div class="shooting-star" id="shootingStar"></div>
+
+    <div class="wish-card" id="wishCard">
+        <h1>Make A Wish ✨</h1>
+        <p>The universe is listening tonight...</p>
+        <textarea id="wishInput" placeholder="Write your birthday wish here..."></textarea>
+        <button id="sendWish">🌠 Send Wish</button>
+    </div>
+
+    <div id="success">
+        <h1>Wish Sent ✨</h1>
+        <p>Your wish has been safely delivered to the stars.</p>
+        <button id="secretBtn">💜 Continue</button>
+    </div>
+</div>
+
+<script>
+    /* STARRY SKY GENERATION */
+    const starCount = 150;
+    const fragment = document.createDocumentFragment();
+    const wishPage = document.getElementById("wishPage");
+
+    for (let i = 0; i < starCount; i++) {
+        const star = document.createElement("div");
+        star.classList.add("star");
+        star.style.left = Math.random() * 100 + "%";
+        star.style.top = Math.random() * 100 + "%";
+        star.style.animationDuration = (Math.random() * 3 + 1.5) + "s";
+        fragment.appendChild(star);
+    }
+    wishPage.appendChild(fragment);
+
+    /* CINEMATIC TIMELINE (Prevents White Flashes) */
+    const introTl = gsap.timeline();
+
+    introTl.to("#intro", {
+        opacity: 0,
+        duration: 1.5,
+        delay: 3.5
+    })
+    .set("#intro", { display: "none" })
+    .to("#wishPage", {
+        opacity: 1,
+        autoAlpha: 1,
+        duration: 1.2
+    }, "-=0.2")
+    .from(".wish-card", {
+        scale: 0.9,
+        y: 30,
+        duration: 1.2,
+        ease: "power3.out"
+    }, "-=1.2")
+    .from(".moon", {
+        opacity: 0,
+        scale: 0.7,
+        duration: 1.5
+    }, "-=1");
+
+    /* ANIMATED SYSTEM TO SEND WISH */
+    document.getElementById("sendWish").addEventListener("click", () => {
+        const wishValue = document.getElementById("wishInput").value;
+        localStorage.setItem("birthdayWish", wishValue);
+
+        const actionTl = gsap.timeline();
+
+        // 1. Fire shooting star across screen while locking interaction
+        actionTl.set("#sendWish", { pointerEvents: "none" })
+        .fromTo("#shootingStar", 
+            { x: -300, y: -100, opacity: 0 },
+            { x: window.innerWidth + 300, y: window.innerHeight / 2, opacity: 1, duration: 1.8, ease: "power1.inOut" }
+        )
+        // 2. Beautiful cross-fade out card, cross-fade in success message
+        .to("#wishCard", {
+            opacity: 0,
+            scale: 0.95,
+            duration: 0.8,
+            ease: "power2.in"
+        }, "-=0.6")
+        .set("#wishCard", { display: "none" })
+        .set("#success", { display: "block" })
+        .to("#success", {
+            opacity: 1,
+            duration: 1,
+            ease: "power2.out"
+        })
+        .from("#success h1, #success p, #secretBtn", {
+            y: 30,
+            opacity: 0,
+            stagger: 0.15,
+            duration: 0.8,
+            ease: "power3.out"
+        }, "-=0.8");
+    });
+
+    /* NEXT PAGE MOVEMENT */
+    document.getElementById("secretBtn").addEventListener("click", () => {
+        gsap.to("#wishPage", {
+            opacity: 0,
+            duration: 0.8,
+            onComplete: () => {
+                window.location.href = "secret2.html";
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why You're Special</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            background: radial-gradient(circle at center, #17142d 0%, #0b1020 50%, #020617 100%);
+            min-height: 100vh;
+        }
+
+        /* INTRO SCREEN */
+        #introScreen {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: #020617;
+            z-index: 999;
+        }
+
+        #introText {
+            color: white;
+            font-size: clamp(2rem, 5vw, 4rem);
+            max-width: 900px;
+            padding: 20px;
+            line-height: 1.5;
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* PAGE */
+        #specialPage {
+            opacity: 0;
+            visibility: hidden; /* Prevents interaction before intro ends */
+            min-height: 100vh;
+            padding: 120px 8%;
+        }
+
+        /* HEADING */
+        .special-heading {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-tag {
+            color: #ec4899;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .special-heading h1 {
+            color: white;
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* GRID */
+        .special-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 35px;
+        }
+
+        /* CARDS */
+        .special-card {
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .08);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 40px;
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .special-card::before {
+            content: "";
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(236, 72, 153, .15), transparent 70%);
+            top: -100px;
+            right: -100px;
+        }
+
+        .special-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 20px 50px rgba(236, 72, 153, .15);
+        }
+
+        .special-card span {
+            font-size: 3rem;
+        }
+
+        .special-card h3 {
+            color: white;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            font-size: 1.6rem;
+        }
+
+        .special-card p {
+            color: #cbd5e1;
+            line-height: 1.8;
+        }
+
+        /* CLOSING */
+        .closing-line {
+            text-align: center;
+            color: white;
+            max-width: 900px;
+            margin: 120px auto 60px;
+            line-height: 2;
+            font-size: 1.4rem;
+        }
+
+        /* BUTTON */
+        .next-btn {
+            display: block;
+            margin: auto;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 999px;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(236, 72, 153, .3);
+        }
+
+        /* PARTICLES */
+        .particle {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            background: white;
+            border-radius: 50%;
+            opacity: .3;
+            pointer-events: none; /* Prevents particles from stealing clicks */
+            will-change: transform; /* Enhances performance */
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            from {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+            50% {
+                opacity: .6;
+            }
+            to {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="introScreen">
+    <h1 id="introText">Every person has a story...</h1>
+</div>
+
+<section id="specialPage">
+    <div class="special-heading">
+        <p class="section-tag">Why You're Special</p>
+        <h1>Things That Make You Amazing</h1>
+    </div>
+
+    <div class="special-grid">
+        <div class="special-card">
+            <span>😊</span>
+            <h3>Your Smile</h3>
+            <p>The kind of smile that can brighten even the hardest days.</p>
+        </div>
+
+        <div class="special-card">
+            <span>🌸</span>
+            <h3>Your Kindness</h3>
+            <p>You care about people more than you realize.</p>
+        </div>
+
+        <div class="special-card">
+            <span>✨</span>
+            <h3>Your Presence</h3>
+            <p>Some people make places feel warmer just by being there.</p>
+        </div>
+
+        <div class="special-card">
+            <span>💜</span>
+            <h3>Being You</h3>
+            <p>You don't need to change anything. Being yourself is enough.</p>
+        </div>
+    </div>
+
+    <div class="closing-line">
+        You may not always see it, but you have a beautiful way of making people's lives brighter.
+    </div>
+
+    <button class="next-btn" id="memoryBtn">
+        📸 Continue To Memory Lane
+    </button>
+</section>
+
+<script>
+    /* PARTICLES GENERATOR */
+    const particleCount = 50;
+    const fragment = document.createDocumentFragment();
+    
+    for (let i = 0; i < particleCount; i++) {
+        const p = document.createElement("div");
+        p.classList.add("particle");
+        p.style.left = Math.random() * 100 + "%";
+        p.style.animationDuration = (10 + Math.random() * 15) + "s";
+        p.style.animationDelay = (Math.random() * 10) + "s"; // Staggers entry
+        fragment.appendChild(p);
+    }
+    document.body.appendChild(fragment);
+
+    /* CINEMATIC INTRO TIMELINE */
+    const tl = gsap.timeline();
+
+    tl.to("#introText", {
+        opacity: 0,
+        duration: 1.5,
+        delay: 2.5
+    })
+    .call(() => {
+        document.getElementById("introText").innerHTML = "But some people become the most beautiful chapter.";
+    })
+    .to("#introText", {
+        opacity: 1,
+        duration: 1.5
+    })
+    .to("#introScreen", {
+        opacity: 0,
+        duration: 1.5,
+        delay: 2
+    })
+    .set("#introScreen", { 
+        display: "none" 
+    })
+    .to("#specialPage", {
+        opacity: 1,
+        autoAlpha: 1, /* Automatically switches visibility from hidden to visible */
+        duration: 1.5
+    }, "-=1.5") /* Starts main page fade slightly early for a smooth transition */
+    .from(".special-heading", {
+        y: 60,
+        opacity: 0,
+        duration: 1.2
+    }, "-=0.8")
+    .from(".special-card", {
+        y: 80,
+        opacity: 0,
+        stagger: 0.2,
+        duration: 1,
+        ease: "power3.out"
+    }, "-=0.8");
+
+    /* NEXT PAGE TRANSITION */
+    document.getElementById("memoryBtn").addEventListener("click", () => {
+        gsap.to("#specialPage", {
+            opacity: 0,
+            duration: 1,
+            onComplete: () => {
+                window.location.href = "memory.html";
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

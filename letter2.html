@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Letter For You</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            background: radial-gradient(circle at center, #17142d, #0b1020, #020617);
+            height: 100vh;
+        }
+
+        /* INTRO */
+        #introScreen {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: #020617;
+            z-index: 999;
+        }
+
+        #introText {
+            color: white;
+            font-size: clamp(2rem, 5vw, 4rem);
+            max-width: 900px;
+            font-family: 'Playfair Display', serif;
+            padding: 20px;
+        }
+
+        /* PAGE */
+        #letterPage {
+            opacity: 0;
+            visibility: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* ENVELOPE CONTROLLER */
+        .envelope-container {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .envelope {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            cursor: pointer;
+            z-index: 10;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .envelope-body {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid rgba(255, 255, 255, .15);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+        }
+
+        .envelope-top {
+            position: absolute;
+            width: 100%;
+            height: 100px;
+            background: rgba(255, 255, 255, .1);
+            clip-path: polygon(0 0, 50% 100%, 100% 0);
+            transform-origin: top;
+            z-index: 2;
+        }
+
+        /* INTERACTIVE TAP BUTTON */
+        .tap-hint {
+            position: absolute;
+            z-index: 15;
+            pointer-events: none; /* Let clicks pass straight through to the envelope */
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.9), rgba(139, 92, 246, 0.9));
+            color: white;
+            padding: 10px 24px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 10px 25px rgba(236, 72, 153, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            white-space: nowrap;
+        }
+
+        /* LETTER CARD */
+        .letter {
+            position: absolute;
+            width: min(600px, 90%);
+            max-height: 75vh;
+            overflow-y: auto;
+            background: rgba(11, 16, 32, 0.95);
+            color: #f8fafc;
+            padding: 40px;
+            border-radius: 30px;
+            border: 1px solid rgba(256, 256, 256, 0.1);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(236, 72, 153, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(50px) scale(0.95);
+            z-index: 20;
+            cursor: pointer;
+        }
+
+        .letter h2 {
+            font-family: 'Playfair Display', serif;
+            color: #ec4899;
+            margin-bottom: 25px;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        #typedMessage {
+            line-height: 1.8;
+            font-size: 1.1rem;
+            white-space: pre-line;
+            color: #e2e8f0;
+        }
+
+        /* BOTTOM NAVIGATION BUTTON */
+        .next-btn {
+            margin-top: 30px;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            z-index: 30;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 15px 30px rgba(236, 72, 153, 0.35);
+        }
+    </style>
+</head>
+<body>
+
+<div id="introScreen">
+    <h1 id="introText">Some things are easier written than spoken...</h1>
+</div>
+
+<div id="letterPage">
+    <div class="envelope-container" id="envelopeContainer">
+        <div class="envelope" id="openEnvelope">
+            <div class="envelope-body"></div>
+            <div class="envelope-top"></div>
+        </div>
+        <div class="tap-hint" id="tapHint">Tap 👆</div>
+    </div>
+
+    <div class="letter" id="letter">
+        <h2>Dear Rishmita ❤️</h2>
+        <div id="typedMessage"></div>
+    </div>
+
+    <button class="next-btn" id="wishBtn">🌠 Continue</button>
+</div>
+
+<script>
+    const letterText = `Thank you for every conversation.
+
+Thank you for every smile.
+
+Thank you for every moment, whether big or small.
+
+You probably don't even realize how much brighter you make the people around you feel.
+
+Some people leave memories.
+Some people leave an impact.
+You somehow do both.
+
+I genuinely hope this year brings you happiness, success, beautiful memories, and everything you deserve.
+
+And no matter what happens, never forget how special you are.
+
+Happy Birthday ❤️`;
+
+    let typingTimeout;
+    let isTyping = false;
+    let textIndex = 0;
+
+    /* CINEMATIC TIMELINE CONTROL */
+    const introTl = gsap.timeline();
+
+    introTl.to("#introScreen", {
+        opacity: 0,
+        duration: 1.5,
+        delay: 3.5
+    })
+    .set("#introScreen", { display: "none" })
+    .set("#letterPage", { display: "flex" })
+    .to("#letterPage", {
+        opacity: 1,
+        autoAlpha: 1,
+        duration: 1
+    })
+    .from("#envelopeContainer", {
+        scale: 0,
+        duration: 1.2,
+        ease: "back.out(1.5)"
+    }, "-=0.5")
+    .call(() => {
+        // Starts the gentle floating pulse animation for the tap hint once visible
+        gsap.to("#tapHint", {
+            y: -8,
+            duration: 1.2,
+            repeat: -1,
+            yoyo: true,
+            ease: "power1.inOut"
+        });
+    });
+
+    /* ENVELOPE OPEN TRIGGER */
+    document.getElementById("openEnvelope").addEventListener("click", function() {
+        document.getElementById("openEnvelope").style.pointerEvents = "none";
+
+        const openTl = gsap.timeline();
+        
+        // Vanish the tap button instantly upon interaction
+        openTl.to("#tapHint", {
+            opacity: 0,
+            scale: 0.5,
+            duration: 0.3,
+            ease: "power2.in"
+        })
+        .to(".envelope-top", {
+            rotateX: 180,
+            duration: 0.8,
+            ease: "power2.inOut"
+        }, "-=0.1")
+        .to("#envelopeContainer", {
+            y: 100,
+            opacity: 0,
+            scale: 0.8,
+            duration: 0.8,
+            ease: "power2.in"
+        }, "-=0.2")
+        .set("#envelopeContainer", { display: "none" })
+        .to("#letter", {
+            opacity: 1,
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            duration: 1,
+            ease: "power3.out"
+        }, "-=0.3")
+        .call(() => {
+            startTyping();
+        });
+    });
+
+    /* TYPEWRITER SYSTEM WITH AUTO-SKIP ON CLICK */
+    const target = document.getElementById("typedMessage");
+
+    function startTyping() {
+        isTyping = true;
+        typeNextChar();
+    }
+
+    function typeNextChar() {
+        if (textIndex < letterText.length) {
+            target.innerHTML += letterText.charAt(textIndex);
+            textIndex++;
+            typingTimeout = setTimeout(typeNextChar, 35);
+        } else {
+            finishLetter();
+        }
+    }
+
+    function finishLetter() {
+        isTyping = false;
+        clearTimeout(typingTimeout);
+        target.innerHTML = letterText;
+        
+        gsap.to("#wishBtn", {
+            opacity: 1,
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power2.out"
+        });
+    }
+
+    /* CLICK ON THE LETTER TO INSTANTLY REVEAL ALL TEXT */
+    document.getElementById("letter").addEventListener("click", () => {
+        if (isTyping) {
+            finishLetter();
+        }
+    });
+
+    /* NEXT PAGE MOVEMENT */
+    document.getElementById("wishBtn").addEventListener("click", () => {
+        gsap.to("#letterPage", {
+            opacity: 0,
+            duration: 0.8,
+            onComplete: () => {
+                window.location.href = "wish1.html";
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
