@@ -25,6 +25,35 @@
             height: 100vh;
         }
 
+        /* FLOATING AUDIO CONTROLLER */
+        #audioControlContainer {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+
+        .audio-fab {
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            border: none;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;
+        }
+
+        .audio-fab:hover {
+            transform: scale(1.1) translateY(-3px);
+            box-shadow: 0 12px 30px rgba(236, 72, 153, 0.6);
+        }
+
         /* INTRO */
         #introScreen {
             position: fixed;
@@ -101,7 +130,7 @@
         .tap-hint {
             position: absolute;
             z-index: 15;
-            pointer-events: none; /* Let clicks pass straight through to the envelope */
+            pointer-events: none;
             background: linear-gradient(135deg, rgba(236, 72, 153, 0.9), rgba(139, 92, 246, 0.9));
             color: white;
             padding: 10px 24px;
@@ -174,6 +203,12 @@
 </head>
 <body>
 
+<audio id="letterMusic" loop></audio>
+
+<div id="audioControlContainer">
+    <button id="audioFab" class="audio-fab" title="Toggle Music">⏸️</button>
+</div>
+
 <div id="introScreen">
     <h1 id="introText">Some things are easier written than spoken...</h1>
 </div>
@@ -196,6 +231,31 @@
 </div>
 
 <script>
+    /* AUDIO CONTROLLER HANDSHAKE ARCHITECTURE */
+    const audioTrack = document.getElementById("letterMusic");
+    const audioFabBtn = document.getElementById("audioFab");
+
+    audioTrack.volume = 0.75;
+    
+    // Maintain Song 2 on this page
+    audioTrack.src = "Assets/songs/until_i_find_you.mp3";
+
+    // Play if permission token exists
+    if (localStorage.getItem("playMusic") === "true") {
+        audioTrack.play().catch(err => console.log("Autoplay context initialization saved:", err));
+    }
+
+    // Floating Button Event Listener
+    audioFabBtn.addEventListener("click", () => {
+        if (audioTrack.paused) {
+            audioTrack.play();
+            audioFabBtn.innerText = "⏸️";
+        } else {
+            audioTrack.pause();
+            audioFabBtn.innerText = "🎵";
+        }
+    });
+
     const letterText = `Thank you for every conversation.
 
 Thank you for every smile.
@@ -239,7 +299,6 @@ Happy Birthday ❤️`;
         ease: "back.out(1.5)"
     }, "-=0.5")
     .call(() => {
-        // Starts the gentle floating pulse animation for the tap hint once visible
         gsap.to("#tapHint", {
             y: -8,
             duration: 1.2,
@@ -255,7 +314,6 @@ Happy Birthday ❤️`;
 
         const openTl = gsap.timeline();
         
-        // Vanish the tap button instantly upon interaction
         openTl.to("#tapHint", {
             opacity: 0,
             scale: 0.5,
@@ -327,8 +385,15 @@ Happy Birthday ❤️`;
         }
     });
 
-    /* NEXT PAGE MOVEMENT */
+    /* NEXT PAGE MOVEMENT WITH AUDIO TOKENS */
     document.getElementById("wishBtn").addEventListener("click", () => {
+        // Keep music authorization alive for next page load context
+        localStorage.setItem("playMusic", "true");
+        
+        // OPTIONAL: Set to true if you want wish1.html to transition to a 3rd song.
+        // If you want it to keep playing this same song (yoursong2.mp3), change this to "false".
+        localStorage.setItem("nextSong", "true"); 
+
         gsap.to("#letterPage", {
             opacity: 0,
             duration: 0.8,

@@ -14,7 +14,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
 <style>
-
 *{
     margin:0;
     padding:0;
@@ -26,545 +25,621 @@ html{
 }
 
 body{
-
     font-family:'Poppins',sans-serif;
-
-    background:
-    radial-gradient(circle at center,
-    #17142d,
-    #0b1020,
-    #020617);
-
+    background: radial-gradient(circle at center, #17142d, #0b1020, #020617);
     overflow-x:hidden;
 }
 
-/* INTRO */
+/* FLOATING AUDIO CONTROLLER */
+#audioControlContainer {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+}
 
+.audio-fab {
+    background: linear-gradient(135deg, #ec4899, #8b5cf6);
+    border: none;
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;
+}
+
+.audio-fab:hover {
+    transform: scale(1.1) translateY(-3px);
+    box-shadow: 0 12px 30px rgba(236, 72, 153, 0.6);
+}
+
+/* INTRO / LOADING SCREEN */
 #introScreen{
-
     position:fixed;
     inset:0;
-
     background:#020617;
-
     display:flex;
+    flex-direction: column;
     justify-content:center;
     align-items:center;
-
     z-index:999;
+    padding: 30px;
 }
 
 #introText{
-
     color:white;
-
-    font-size:
-    clamp(2rem,5vw,4rem);
-
+    font-size: clamp(2rem,5vw,4rem);
     text-align:center;
-
     max-width:900px;
+    font-family: 'Playfair Display',serif;
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+}
 
-    padding:30px;
+/* BIRTHDAY VIBE LOADING UI */
+.birthday-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    opacity: 1;
+}
 
-    font-family:
-    'Playfair Display',serif;
+/* CSS Candle Animation */
+.candle-wrapper {
+    position: relative;
+    width: 60px;
+    height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.flame {
+    position: absolute;
+    top: 15px;
+    width: 24px;
+    height: 40px;
+    background: linear-gradient(to bottom, #ffea4a, #ff7b00, #ff0055);
+    border-radius: 50% 50% 20% 20% / 70% 70% 30% 30%;
+    animation: flicker 0.15s ease-in-out infinite alternate;
+    filter: drop-shadow(0 0 20px rgba(255,123,0,0.8));
+    opacity: 0;
+    transform: scale(0);
+    transform-origin: bottom center;
+    transition: opacity 0.2s, transform 0.3s;
+}
+
+.flame.lit {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.wick {
+    width: 4px;
+    height: 15px;
+    background: #2e1065;
+    border-radius: 2px;
+}
+
+.candle-body {
+    width: 38px;
+    height: 120px;
+    background: linear-gradient(90deg, #ec4899, #8b5cf6);
+    border-radius: 8px 8px 4px 4px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 25px rgba(236, 72, 153, 0.3);
+    overflow: hidden;
+}
+
+.candle-body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 15px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 0 0 10px 10px;
+}
+
+#candleNumber {
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    font-family: 'Playfair Display', serif;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    z-index: 2;
+}
+
+.loading-text {
+    color: #cbd5e1;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    margin-top: 15px;
+    min-height: 35px;
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+}
+
+@keyframes flicker {
+    0% { transform: scale(1) rotate(-1deg); }
+    100% { transform: scale(1.05) rotate(1deg); filter: drop-shadow(0 0 25px rgba(255,165,0,0.9)); }
 }
 
 /* MEMORY PAGE */
-
 #memoryPage{
-
     opacity:0;
-
     padding:120px 8%;
 }
 
+.memory-card{
+    width:520px;
+    min-height:550px;
+    background:rgba(255,255,255,.05);
+    backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:30px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    transition:.4s ease-in-out;
+    cursor:pointer;
+}
+
+.memory-card img {
+    width: 100%;
+    height: 700px;
+    object-fit: cover; /* This will now fit perfectly without losing faces */
+    background: #111827;
+    display: block;
+}
+
+.memory-card:hover{
+    transform:translateY(-10px) scale(1.03);
+    box-shadow: 0 15px 40px rgba(236,72,153,.25);
+}
+
+.memory-content {
+    padding: 25px;
+    color: white;
+}
+
+.memory-content h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.memory-content p {
+    color: #cbd5e1;
+    font-size: 0.95rem;
+}
+
+.extra-text{
+    max-height:0;
+    overflow:hidden;
+    transition:.5s ease;
+    color:#d1d5db;
+    line-height:1.8;
+    margin-top:0;
+    font-size: 0.9rem;
+}
+
+.memory-card.active .extra-text{
+    max-height:300px;
+    margin-top:15px;
+}
+
 .heading{
-
     text-align:center;
-
     margin-bottom:100px;
 }
 
 .heading p{
-
     color:#ec4899;
-
     letter-spacing:4px;
 }
 
 .heading h1{
-
     color:white;
-
     margin-top:15px;
-
-    font-size:
-    clamp(3rem,6vw,5rem);
-
-    font-family:
-    'Playfair Display',serif;
+    font-size: clamp(3rem,6vw,5rem);
+    font-family: 'Playfair Display',serif;
 }
 
 /* TIMELINE */
-
 .timeline{
-
-    position:relative;
-
-    max-width:1200px;
-
+    max-width:1400px;
     margin:auto;
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:60px;
+    position:relative;
 }
 
 .timeline::before{
-
     content:"";
-
     position:absolute;
-
     left:50%;
-
+    top:0;
     width:4px;
-
     height:100%;
-
-    background:
-    linear-gradient(
-    #ec4899,
-    #8b5cf6
-    );
-
-    transform:
-    translateX(-50%);
+    background:linear-gradient(#ec4899,#8b5cf6);
+    transform:translateX(-50%);
 }
 
 .memory{
-
-    width:50%;
-
-    padding:30px;
-}
-
-.memory:nth-child(odd){
-
-    margin-left:0;
-}
-
-.memory:nth-child(even){
-
-    margin-left:50%;
-}
-
-.memory-card{
-
-    background:
-    rgba(255,255,255,.05);
-
-    backdrop-filter:
-    blur(20px);
-
-    border:
-    1px solid rgba(255,255,255,.08);
-
-    border-radius:30px;
-
-    overflow:hidden;
-
-    transition:.5s;
-}
-
-.memory-card:hover{
-
-    transform:
-    translateY(-10px);
-
-    box-shadow:
-    0 20px 50px rgba(236,72,153,.15);
-}
-
-.memory-card img{
-
     width:100%;
-
-    height:320px;
-
-    object-fit:cover;
-}
-
-.memory-content{
-
-    padding:25px;
-}
-
-.memory-content h3{
-
-    color:white;
-
-    margin-bottom:15px;
-}
-
-.memory-content p{
-
-    color:#cbd5e1;
-
-    line-height:1.8;
+    padding:0;
+    margin:0 !important;
+    display:flex;
+    justify-content:center;
 }
 
 /* END MESSAGE */
-
 .end-message{
-
     text-align:center;
-
     margin-top:120px;
-
     color:white;
-
     max-width:900px;
-
     margin-left:auto;
     margin-right:auto;
-
     font-size:1.4rem;
-
     line-height:2;
 }
 
 /* BUTTON */
-
 .next-btn{
-
     display:block;
-
     margin:80px auto;
-
     border:none;
-
     padding:18px 40px;
-
     border-radius:999px;
-
-    background:
-    linear-gradient(
-    135deg,
-    #ec4899,
-    #8b5cf6
-    );
-
+    background: linear-gradient(135deg, #ec4899, #8b5cf6);
     color:white;
-
     cursor:pointer;
-
     transition:.4s;
 }
 
 .next-btn:hover{
-
-    transform:
-    translateY(-5px)
-    scale(1.05);
+    transform: translateY(-5px) scale(1.05);
 }
 
 /* PARTICLES */
-
 .particle{
-
     position:fixed;
-
     width:3px;
     height:3px;
-
     border-radius:50%;
-
     background:white;
-
     opacity:.3;
-
-    animation:
-    floatUp linear infinite;
+    animation: floatUp linear infinite;
+    z-index: 1;
 }
 
 @keyframes floatUp{
-
     from{
-
-        transform:
-        translateY(100vh);
-
+        transform: translateY(100vh);
         opacity:0;
     }
-
     50%{
         opacity:.5;
     }
-
     to{
-
-        transform:
-        translateY(-100px);
-
+        transform: translateY(-100px);
         opacity:0;
     }
 }
 
-@media(max-width:768px){
-
-.timeline::before{
-
-    left:20px;
+@media(max-width:968px){
+    .timeline{
+        grid-template-columns: 1fr;
+    }
+    .timeline::before{
+        left:20px;
+    }
+    .memory{
+        justify-content: flex-start;
+        padding-left:50px;
+    }
+    .memory-card {
+        width: 100%;
+    }
 }
-
-.memory{
-
-    width:100%;
-
-    margin-left:0 !important;
-
-    padding-left:50px;
-}
-
-}
-
 </style>
 </head>
 
 <body>
 
+<audio id="memoryMusic" loop></audio>
+
+<div id="audioControlContainer">
+    <button id="audioFab" class="audio-fab" title="Toggle Music">⏸️</button>
+</div>
+
 <div id="introScreen">
-
-    <h1 id="introText">
-
-        Every photo tells a story...
-
-    </h1>
-
+    <div class="birthday-loader" id="loaderUI">
+        <div class="candle-wrapper">
+            <div class="flame" id="candleFlame"></div>
+            <div class="wick"></div>
+            <div class="candle-body">
+                <span id="candleNumber">1</span>
+            </div>
+        </div>
+        <div class="loading-text" id="loadingStatus">Preparing your cake...</div>
+    </div>
+    
+    <h1 id="introText">Every photo tells a story...</h1>
 </div>
 
 <section id="memoryPage">
 
 <div class="heading">
-
     <p>MEMORY LANE</p>
-
     <h1>Moments Worth Remembering</h1>
-
 </div>
 
 <div class="timeline">
 
-<div class="memory">
+    <div class="memory">
+        <div class="memory-card">
+            <img src="Assets/photos/Rishmita1.jpeg">
+            <div class="memory-content">
+                <h3>The First Smile</h3>
+                <p>Some smiles stay in your heart long after the moment has passed.</p>
+                <div class="extra-text">Looking back at this moment, it reminds me of how infectious your joy is. A memory that forever anchors a warm spot in time.</div>
+            </div>
+        </div>
+    </div>
 
-<div class="memory-card">
+    <div class="memory">
+        <div class="memory-card">
+            <img src="Assets/photos/Rishmita2.jpeg">
+            <div class="memory-content">
+                <h3>A Beautiful Moment</h3>
+                <p>One picture, countless memories, and a feeling I'll never forget.</p>
+                <div class="extra-text">It wasn't just about where we were, but who I was with. Everything about this day felt perfectly placed.</div>
+            </div>
+        </div>
+    </div>
 
-<img src="assets/memory1.jpg">
+    <div class="memory">
+        <div class="memory-card">
+            <img src="Assets/photos/Rishmita3.jpeg">
+            <div class="memory-content">
+                <h3>Pure Happiness</h3>
+                <p>Happiness always looks better when it's genuine.</p>
+                <div class="extra-text">No filters, no setups—just pure raw laughter frozen in frames. May this kind of joy follow you all through your 22nd year.</div>
+            </div>
+        </div>
+    </div>
 
-<div class="memory-content">
+    <div class="memory">
+        <div class="memory-card">
+            <img src="Assets/photos/Rishmita4.jpeg">
+            <div class="memory-content">
+                <h3>Time Stands Still</h3>
+                <p>If I could pause one moment forever, it might be this one.</p>
+                <div class="extra-text">The world gets incredibly loud, but looking back at this makes everything pause into perfect quiet balance.</div>
+            </div>
+        </div>
+    </div>
 
-<h3>One Of My Favorite Photos</h3>
+    <div class="memory">
+        <div class="memory-card">
+            <img src="Assets/photos/Rishmita5.png">
+            <div class="memory-content">
+                <h3>Golden Memories</h3>
+                <p>Some memories become brighter every time we look back.</p>
+                <div class="extra-text">Like fine wine, the magic of this specific day only grows sweeter with time. Definitely one for the history books.</div>
+            </div>
+        </div>
+    </div>
 
-<p>
-A simple moment,
-but somehow one I'll always remember.
-</p>
+    <div class="memory">
+        <div class="memory-card">
+            <img src="Assets/photos/Rishmita6.jpeg">
+            <div class="memory-content">
+                <h3>Unforgettable You</h3>
+                <p>Not every photo needs words—this one speaks for itself.</p>
+                <div class="extra-text">Even without a caption, the warmth radiating from this picture tells the whole beautiful story clearly.</div>
+            </div>
+        </div>
+    </div>
 
-</div>
+    <div class="memory">
+        <div class="memory-card">
+            <img src="Assets/photos/Rishmita7.jpeg">
+            <div class="memory-content">
+                <h3>One More Chapter</h3>
+                <p>Every picture tells another beautiful chapter of the story.</p>
+                <div class="extra-text">We've written so many incredible chapters together so far, and I can't wait to write the ones still ahead.</div>
+            </div>
+        </div>
+    </div>
 
-</div>
-
-</div>
-
-<div class="memory">
-
-<div class="memory-card">
-
-<img src="assets/memory2.jpg">
-
-<div class="memory-content">
-
-<h3>That Smile</h3>
-
-<p>
-Some pictures don't need captions.
-This is one of them.
-</p>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="memory">
-
-<div class="memory-card">
-
-<img src="assets/memory3.jpg">
-
-<div class="memory-content">
-
-<h3>Another Beautiful Memory</h3>
-
-<p>
-One of those moments
-that deserves a permanent place here.
-</p>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="memory">
-
-<div class="memory-card">
-
-<img src="assets/memory4.jpg">
-
-<div class="memory-content">
-
-<h3>A Special Day</h3>
-
-<p>
-A memory worth keeping forever.
-</p>
-
-</div>
-
-</div>
-
-</div>
+    <div class="memory">
+        <div class="memory-card">
+            <img src="Assets/photos/Rishmita8.jpeg">
+            <div class="memory-content">
+                <h3>Forever Favorite</h3>
+                <p>No matter how much time passes, this moment will always make me smile.</p>
+                <div class="extra-text">Ending this timeline with this gem because it perfectly captures what makes you so unforgettable.</div>
+            </div>
+        </div>
+    </div>
 
 </div>
 
 <div class="end-message">
-
-Some memories fade.
-
-Some stay forever.
-
-And these are definitely the ones
-I never want to forget.
-
-❤️
-
+Some moments become memories.<br>
+Some memories become treasures.<br><br>
+Thank you for filling these pages with smiles, laughter, and unforgettable moments.<br><br>
+Here's to many more beautiful memories yet to come. ❤️
 </div>
 
 <button class="next-btn" id="letterBtn">
-
 💌 Continue
-
 </button>
 
 </section>
 
 <script>
+/* AUDIO PIPELINE & TRANSITION HANDSHAKE */
+const audioTrack = document.getElementById("memoryMusic");
+const audioFabBtn = document.getElementById("audioFab");
+
+audioTrack.volume = 0.75;
+
+if (localStorage.getItem("nextSong") === "true") {
+    audioTrack.src = "Assets/songs/photograph.mp3"; 
+    localStorage.removeItem("nextSong"); 
+} else {
+    audioTrack.src = "Assets/songs/Interstellar.mp3"; 
+}
+
+if (localStorage.getItem("playMusic") === "true") {
+    audioTrack.play().catch(err => console.log("Autoplay preserved, processing interaction layer:", err));
+}
+
+audioFabBtn.addEventListener("click", () => {
+    if (audioTrack.paused) {
+        audioTrack.play();
+        audioFabBtn.innerText = "⏸️";
+    } else {
+        audioTrack.pause();
+        audioFabBtn.innerText = "🎵";
+    }
+});
 
 /* PARTICLES */
-
 for(let i=0;i<60;i++){
-
-    const p =
-    document.createElement("div");
-
+    const p = document.createElement("div");
     p.classList.add("particle");
-
-    p.style.left =
-    Math.random()*100+"%";
-
-    p.style.animationDuration =
-    (10+Math.random()*20)+"s";
-
+    p.style.left = Math.random()*100+"%";
+    p.style.animationDuration = (10+Math.random()*20)+"s";
     document.body.appendChild(p);
 }
 
-/* INTRO */
+/* BIRTHDAY CANDLE RUNNER LOGIC */
+const candleNumber = document.getElementById("candleNumber");
+const candleFlame = document.getElementById("candleFlame");
+const loadingStatus = document.getElementById("loadingStatus");
+const loaderUI = document.getElementById("loaderUI");
+const introText = document.getElementById("introText");
 
-setTimeout(()=>{
+let currentCandle = 1;
+const targetCandles = 22;
 
-    gsap.to("#introText",{
-        opacity:0,
-        duration:1.5
-    });
+function startCandleLoading() {
+    let interval = setInterval(() => {
+        if (currentCandle <= targetCandles) {
+            candleNumber.innerText = currentCandle;
+            loadingStatus.innerText = `Lighting candle ${currentCandle} of 22...`;
+            
+            candleFlame.classList.remove("lit");
+            void candleFlame.offsetWidth; 
+            candleFlame.classList.add("lit");
 
-},2500);
+            currentCandle++;
+        } else {
+            clearInterval(interval);
+            loadingStatus.innerText = "All candles lit! ✨";
+            proceedToTextScreens();
+        }
+    }, 150); 
+}
 
-setTimeout(()=>{
+setTimeout(startCandleLoading, 600);
 
-    document.getElementById("introText").innerHTML =
-    "Some stories deserve to be remembered forever.";
-
-    gsap.fromTo("#introText",
-    {
-        opacity:0
-    },
-    {
-        opacity:1,
-        duration:1.5
-    });
-
-},4500);
-
-setTimeout(()=>{
-
-    gsap.to("#introScreen",{
-
-        opacity:0,
-
-        duration:1.5,
-
-        onComplete:()=>{
-
-            document.getElementById("introScreen")
-            .style.display="none";
-
-            gsap.to("#memoryPage",{
-
-                opacity:1,
-
-                duration:1.5
-            });
-
-            gsap.from(".memory",{
-
-                y:100,
-
-                opacity:0,
-
-                stagger:.25,
-
-                duration:1.2
-            });
-
+/* NARRATIVE PIPELINE */
+function proceedToTextScreens() {
+    const tl = gsap.timeline();
+    
+    tl.to(loaderUI, {
+        opacity: 0,
+        y: -30,
+        duration: 0.8,
+        delay: 0.5,
+        onComplete: () => { loaderUI.style.display = "none"; }
+    })
+    .to(introText, {
+        opacity: 1,
+        duration: 1.2
+    })
+    .to(introText, {
+        opacity: 0,
+        duration: 1.2,
+        delay: 2
+    })
+    .call(() => {
+        introText.innerHTML = "Some stories deserve to be remembered forever.";
+    })
+    .to(introText, {
+        opacity: 1,
+        duration: 1.2
+    })
+    .to(introText, {
+        opacity: 0,
+        duration: 1.2,
+        delay: 2
+    })
+    .to("#introScreen", {
+        opacity: 0,
+        duration: 1.2,
+        onComplete: () => {
+            document.getElementById("introScreen").style.display = "none";
+            revealTimeline();
         }
     });
+}
 
-},8000);
-
-/* NEXT PAGE */
-
-document
-.getElementById("letterBtn")
-.addEventListener("click",()=>{
-
-    gsap.to("#memoryPage",{
-
-        opacity:0,
-
-        duration:1,
-
-        onComplete:()=>{
-
-            window.location.href =
-            "letter2.html";
-
-        }
+function revealTimeline() {
+    gsap.to("#memoryPage", {
+        opacity: 1,
+        duration: 1.5
     });
 
+    gsap.from(".memory", {
+        y: 100,
+        opacity: 0,
+        stagger: .25,
+        duration: 1.2,
+        ease: "power2.out"
+    });
+}
+
+document.querySelectorAll(".memory-card").forEach(card=>{
+    card.addEventListener("click",()=>{
+        card.classList.toggle("active");
+    });
 });
 
+/* NEXT PAGE BUTTON */
+document.getElementById("letterBtn").addEventListener("click", () => {
+    localStorage.setItem("playMusic", "true");
+
+    gsap.to("#memoryPage", {
+        opacity: 0,
+        duration: 1,
+        onComplete: () => {
+            window.location.href = "letter2.html";
+        }
+    });
+});
 </script>
 
 </body>

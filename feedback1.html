@@ -28,7 +28,36 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
-            overflow: hidden; /* Disables page scrolling entirely */
+            overflow: hidden;
+        }
+
+        /* FLOATING AUDIO CONTROLLER */
+        #audioControlContainer {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+
+        .audio-fab {
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            border: none;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;
+        }
+
+        .audio-fab:hover {
+            transform: scale(1.1) translateY(-3px);
+            box-shadow: 0 12px 30px rgba(236, 72, 153, 0.6);
         }
 
         /* CARD CONTAINER */
@@ -41,10 +70,9 @@
             padding: 40px;
             text-align: center;
             max-height: 95vh;
-            overflow-y: auto; /* Internal scrolling allowed only for the form if screens are small */
+            overflow-y: auto;
         }
 
-        /* Minimal scrollbar for form container */
         .feedback-card::-webkit-scrollbar {
             width: 6px;
         }
@@ -151,7 +179,7 @@
             transform: translateY(-3px) scale(1.03);
         }
 
-        /* GOODBYE SECTION - Perfectly Centered & No-Scroll */
+        /* GOODBYE SECTION */
         #goodbye {
             display: none;
             text-align: center;
@@ -184,45 +212,33 @@
             50% { transform: scale(1.2); }
             100% { transform: scale(1); }
         }
-        .memory-book-btn{
 
-    margin-top:40px;
+        .memory-book-btn {
+            margin-top: 40px;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 1rem;
+            color: white;
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            transition: .4s;
+        }
 
-    padding:18px 40px;
-
-    border:none;
-
-    border-radius:999px;
-
-    cursor:pointer;
-
-    font-size:1rem;
-
-    color:white;
-
-    background:
-    linear-gradient(
-        135deg,
-        #ec4899,
-        #8b5cf6
-    );
-
-    transition:.4s;
-}
-
-.memory-book-btn:hover{
-
-    transform:
-    translateY(-5px)
-    scale(1.05);
-
-}
+        .memory-book-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- FEEDBACK FORM CARD -->
+    <audio id="feedbackMusic" loop></audio>
+
+    <div id="audioControlContainer">
+        <button id="audioFab" class="audio-fab" title="Toggle Music">⏸️</button>
+    </div>
+
     <div class="feedback-card" id="feedbackCard">
         <h1 class="title">One Last Thing...</h1>
         <p class="subtitle">How did this little birthday journey make you feel?</p>
@@ -261,7 +277,6 @@
         <button class="submit-btn" id="submitBtn">💜 Send Feedback</button>
     </div>
 
-    <!-- FINAL GOODBYE ENDPAGE -->
     <div id="goodbye">
         <h1>The Website Ends Here...</h1>
         <p>
@@ -271,14 +286,31 @@
             <strong>Happy Birthday ❤️</strong>
         </p>
         <div class="heart">💖</div>
-        <button id="memoryBookBtn" class="memory-book-btn">
-
-    📖 Open Memory Book
-
-</button>
+        <button id="memoryBookBtn" class="memory-book-btn">📖 Open Memory Book</button>
     </div>
 
     <script>
+        /* AUDIO CONTROLLER HANDSHAKE ARCHITECTURE */
+        const audioTrack = document.getElementById("feedbackMusic");
+        const audioFabBtn = document.getElementById("audioFab");
+
+        audioTrack.volume = 0.75;
+        audioTrack.src = "Assets/songs/golden_hour.mp3"; 
+
+        if (localStorage.getItem("playMusic") === "true") {
+            audioTrack.play().catch(err => console.log("Autoplay initialization preserved:", err));
+        }
+
+        audioFabBtn.addEventListener("click", () => {
+            if (audioTrack.paused) {
+                audioTrack.play();
+                audioFabBtn.innerText = "⏸️";
+            } else {
+                audioTrack.pause();
+                audioFabBtn.innerText = "🎵";
+            }
+        });
+
         /* STAR RATING */
         const stars = document.querySelectorAll(".star");
         let rating = 0;
@@ -315,13 +347,11 @@
 
             localStorage.setItem("birthdayFeedback", JSON.stringify(feedback));
 
-            // Celebration effect
             confetti({
                 particleCount: 200,
                 spread: 120
             });
 
-            // Smooth transition away from the form card
             gsap.to("#feedbackCard", {
                 opacity: 0,
                 scale: 0.95,
@@ -330,7 +360,6 @@
                     document.getElementById("feedbackCard").style.display = "none";
                     document.getElementById("goodbye").style.display = "block";
 
-                    // Smooth entry for the fixed goodbye page
                     gsap.fromTo("#goodbye", 
                         { opacity: 0, scale: 0.9 },
                         { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" }
@@ -338,26 +367,17 @@
                 }
             });
         });
-        document
-.getElementById("memoryBookBtn")
-.addEventListener("click",()=>{
 
-    gsap.to("#goodbye",{
-
-        opacity:0,
-
-        duration:1,
-
-        onComplete:()=>{
-
-            window.location.href =
-            "finalgoodbye.html";
-
-        }
-
-    });
-
-});
+        document.getElementById("memoryBookBtn").addEventListener("click", () => {
+            localStorage.setItem("playMusic", "true");
+            gsap.to("#goodbye", {
+                opacity: 0,
+                duration: 1,
+                onComplete: () => {
+                    window.location.href = "finalgoodbye1.html";
+                }
+            });
+        });
     </script>
 
 </body>

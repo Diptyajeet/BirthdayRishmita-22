@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Little Memory Book</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html {
+    scroll-behavior:smooth;
+}
+
+body {
+    font-family:'Poppins',sans-serif;
+    background: linear-gradient(135deg, #FFF8E8 0%, #FFE8D6 30%, #FFD6E8 70%, #F3E8FF 100%);
+    overflow-x:hidden;
+    color:#444;
+}
+
+/* FLOATING AUDIO CONTROLLER */
+#audioControlContainer {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+}
+
+.audio-fab {
+    background: linear-gradient(135deg, #ec4899, #8b5cf6);
+    border: none;
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;
+}
+
+.audio-fab:hover {
+    transform: scale(1.1) translateY(-3px);
+    box-shadow: 0 12px 30px rgba(236, 72, 153, 0.6);
+}
+
+/* HERO */
+.hero {
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    text-align:center;
+    padding:40px;
+}
+
+.hero h1 {
+    font-family:'Playfair Display',serif;
+    font-size: clamp(3rem,7vw,6rem);
+    color:#8b5cf6;
+}
+
+.hero p {
+    margin-top:20px;
+    font-size:1.2rem;
+    max-width:700px;
+    line-height:1.8;
+}
+
+.scroll {
+    margin-top:50px;
+    font-size:1rem;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    50% { transform:translateY(10px); }
+}
+
+/* STICKERS */
+.section-title {
+    text-align:center;
+    margin:120px 0 60px;
+    font-size:3rem;
+    font-family:'Playfair Display',serif;
+    color:#8b5cf6;
+}
+
+.sticker-wall {
+    display:grid;
+    grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+    gap:30px;
+    padding:0 8%;
+}
+
+.sticker {
+    background:white;
+    padding:20px;
+    border-radius:25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    transition:.4s;
+}
+
+.sticker:hover {
+    transform: translateY(-10px) rotate(3deg);
+}
+
+.sticker img {
+    width:100%;
+    height:200px;
+    object-fit:contain;
+}
+
+.caption {
+    margin-top:15px;
+    font-weight:500;
+    text-align:center;
+}
+
+/* MEMORIES */
+.memory-grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+    gap:25px;
+    padding:0 8%;
+}
+
+.memory {
+    background:white;
+    border-radius:25px;
+    overflow:hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    transition:.4s;
+}
+
+.memory:hover {
+    transform: scale(1.03);
+}
+
+.memory img {
+    width:100%;
+    height:650px;
+    object-fit:cover;
+}
+
+.memory p {
+    padding:20px;
+    line-height:1.8;
+}
+
+/* MEMORY JAR & POPPING VIDEOS */
+.jar-section {
+    padding:120px 20px;
+    text-align:center;
+    position: relative;
+}
+
+.jar {
+    font-size:7rem;
+    cursor:pointer;
+    transition:.4s;
+    user-select: none;
+    display: inline-block;
+}
+
+.jar:hover {
+    transform:scale(1.1);
+}
+
+.jar.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none !important;
+}
+
+.random-memory {
+    margin-top:30px;
+    font-size:1.3rem;
+    color:#8b5cf6;
+    font-weight:600;
+    min-height:50px;
+}
+
+/* Video Pop Animation Styles */
+.popping-video {
+    position: fixed;
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    border: 3px solid white;
+    z-index: 500;
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(0);
+    animation: explodeAndFade 2s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes explodeAndFade {
+    0% {
+        transform: translate(-50%, -50%) scale(0) rotate(0deg);
+        opacity: 1;
+    }
+    15% {
+        transform: translate(var(--tx), var(--ty)) scale(1) rotate(var(--rot));
+        opacity: 1;
+    }
+    80% {
+        transform: translate(var(--tx), var(--ty)) scale(1) rotate(var(--rot));
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--tx), calc(var(--ty) + 100px)) scale(0.8) rotate(var(--rot));
+        opacity: 0;
+    }
+}
+
+/* TIMELINE */
+.timeline {
+    max-width:700px;
+    margin:100px auto;
+    text-align:center;
+}
+
+.timeline-step {
+    padding:25px;
+}
+
+.timeline-step h3 {
+    color:#8b5cf6;
+}
+
+/* FINAL */
+.final-section {
+    padding:120px 20px;
+    text-align:center;
+}
+
+.final-section h2 {
+    font-family:'Playfair Display',serif;
+    font-size: clamp(2.5rem,5vw,4rem);
+    color:#8b5cf6;
+}
+
+.final-section p {
+    max-width:800px;
+    margin:30px auto;
+    line-height:2;
+    font-size:1.15rem;
+}
+
+.end-btn {
+    margin-top:40px;
+    padding:18px 40px;
+    border:none;
+    border-radius:999px;
+    cursor:pointer;
+    background: linear-gradient(135deg, #ec4899, #8b5cf6);
+    color:white;
+    font-size:1rem;
+    transition:.4s;
+}
+
+.end-btn:hover {
+    transform: translateY(-5px) scale(1.05);
+}
+
+/* END SCREEN */
+.end-screen {
+    position:fixed;
+    inset:0;
+    background:white;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    z-index:9999;
+}
+
+.end-screen h1 {
+    font-family:'Playfair Display',serif;
+    font-size: clamp(3rem,7vw,6rem);
+    color:#8b5cf6;
+}
+
+.end-screen p {
+    margin-top:20px;
+    font-size:1.2rem;
+}
+</style>
+</head>
+
+<body>
+
+<audio id="goodbyeMusic" loop></audio>
+
+<div id="audioControlContainer">
+    <button id="audioFab" class="audio-fab" title="Toggle Music">⏸️</button>
+</div>
+
+<section class="hero">
+    <h1>📖 Our Little Memory Book</h1>
+    <p>Before you leave... I wanted to keep a few memories, stickers, moments, and laughs together in one place. So here's one last scrapbook.</p>
+    <div class="scroll">👇 Scroll Down</div>
+</section>
+
+<h2 class="section-title">🎭 Sticker Museum</h2>
+<div class="sticker-wall">
+    <div class="sticker">
+        <img src="Assets/sticker/image (3).jpg">
+        <div class="caption">The Drama Sticker 😭</div>
+    </div>
+    <div class="sticker">
+        <img src="Assets/sticker/image (10).jpg">
+        <div class="caption">The Certified Meme Sticker 💀</div>
+    </div>
+    <div class="sticker">
+        <img src="Assets/sticker/image (7).jpg">
+        <div class="caption">The Emotional Damage Sticker 🥹</div>
+    </div>
+    <div class="sticker">
+        <img src="Assets/sticker/image (13).jpg">
+        <div class="caption">The Chaos Sticker 🤡</div>
+    </div>
+</div>
+
+<h2 class="section-title">📸 Memory Board</h2>
+<div class="memory-grid">
+    <div class="memory">
+        <img src="Assets/photos/Memory1.png">
+        <p>Grace isn't just about how you move, it's about staying rooted in who you are.</p>
+    </div>
+    <div class="memory">
+        <img src="Assets/photos/Memory2.jpeg">
+        <p>Chasing sunsets and river breezes.</p>
+    </div>
+    <div class="memory">
+        <img src="Assets/photos/Memory3.jpeg">
+        <p>Lost in a sea of yellow fields.</p>
+    </div>
+    <div class="memory">
+        <img src="Assets/photos/Memory4.jpeg">
+        <p>Bold in red. ❤️</p>
+    </div>
+    <div class="memory">
+        <img src="Assets/photos/Memory6.png">
+        <p>Fragments of a happy heart. ✨</p>
+    </div>
+    <div class="memory">
+        <img src="Assets/photos/Rishmita(Baddie).jpeg">
+        <p>The kind of poetry you don't just read—you feel.</p>
+    </div>
+</div>
+
+<div class="jar-section">
+    <h2 class="section-title">🫙 Memory Jar</h2>
+    <div class="jar" id="memoryJar">🫙</div>
+    <div class="random-memory" id="memoryText">Click the jar ✨ (10 clicks left)</div>
+</div>
+
+<div class="timeline">
+    <div class="timeline-step"><h3>✨ Excitement</h3></div>
+    <div class="timeline-step"><h3>😊 Smiles</h3></div>
+    <div class="timeline-step"><h3>😂 Laughter</h3></div>
+    <div class="timeline-step"><h3>🥹 Memories</h3></div>
+    <div class="timeline-step"><h3>❤️ Appreciation</h3></div>
+    <div class="timeline-step"><h3>🌸 Friendship</h3></div>
+</div>
+
+<section class="final-section">
+    <h2>That's All... For Now 🌸</h2>
+    <p>This website is ending. But don't worry. The memories have been saved permanently. (At least in my heart 😌) Thank you for taking this little journey. Happy Birthday ❤️</p>
+    <button class="end-btn" id="endBtn">🌸 Close Memory Book</button>
+</section>
+
+<div class="end-screen" id="endScreen">
+    <h1>THE END</h1>
+    <p>or maybe... TO BE CONTINUED? ✨</p>
+</div>
+
+<script>
+    /* AUDIO CONTROLLER HANDSHAKE ARCHITECTURE */
+    const audioTrack = document.getElementById("goodbyeMusic");
+    const audioFabBtn = document.getElementById("audioFab");
+
+    audioTrack.volume = 0.75;
+    audioTrack.src = "Assets/songs/Married Life.mp3"; 
+
+    if (localStorage.getItem("playMusic") === "true") {
+        audioTrack.play().catch(err => console.log("Autoplay initialization preserved:", err));
+    }
+
+    audioFabBtn.addEventListener("click", () => {
+        if (audioTrack.paused) {
+            audioTrack.play();
+            audioFabBtn.innerText = "⏸️";
+        } else {
+            audioTrack.pause();
+            audioFabBtn.innerText = "🎵";
+        }
+    });
+
+    const memories = [
+        "Achievement Unlocked: Best Birthday Visitor 🏆",
+        "+100 Friendship Points 💜",
+        "You survived all the pages 😭",
+        "Memory successfully preserved 📸",
+        "Special Person Detected ✨",
+        "Birthday Happiness +1000 🎂"
+    ];
+
+    /* PUT YOUR RANDOM GIF VIDEO PATHS HERE */
+    const gifVideos = [
+        "Assets/gif's/slap.mp4",
+        "Assets/gif's/Baby.mp4",
+        "Assets/gif's/Guy.mp4",
+        "Assets/gif's/Eye.mp4",
+        "Assets/gif's/Girl.mp4",
+        "Assets/gif's/knife.mp4",
+        "Assets/gif's/Dance.mp4",
+        "Assets/gif's/Cute.mp4",
+        "Assets/gif's/petting.mp4",
+        "Assets/gif's/Cat.mp4",
+        
+    ];
+
+    let clickCount = 0;
+    const maxClicks = 10;
+    const jarElement = document.getElementById("memoryJar");
+    const textElement = document.getElementById("memoryText");
+
+    jarElement.addEventListener("click", (e) => {
+        if (clickCount >= maxClicks) return;
+
+        clickCount++;
+        
+        // 1. Handle traditional random memory text update
+        const randomMem = memories[Math.floor(Math.random() * memories.length)];
+        
+        if (clickCount < maxClicks) {
+            textElement.innerText = `${randomMem} (${maxClicks - clickCount} clicks left)`;
+        } else {
+            textElement.innerText = "The jar is completely out of memories! 🫙✨";
+            jarElement.classList.add("disabled");
+            jarElement.innerText = "🫙❌";
+        }
+
+        // 2. Get click coordinates to launch the explosion from the cursor spot
+        const startX = e.clientX;
+        const startY = e.clientY;
+
+        // 3. Pop 10 random gif videos from your selection array
+        for (let i = 0; i < 10; i++) {
+            if (gifVideos.length === 0) break;
+            
+            const randomVideoSrc = gifVideos[Math.floor(Math.random() * gifVideos.length)];
+            
+            const video = document.createElement("video");
+            video.src = randomVideoSrc;
+            video.autoplay = true;
+            video.loop = true;
+            video.muted = true; 
+            video.playsInline = true;
+            video.classList.add("popping-video");
+
+            // Position initial launch point
+            video.style.left = `${startX}px`;
+            video.style.top = `${startY}px`;
+
+            // Calculate dynamic explosion trajectory vector offsets
+            const angle = Math.random() * Math.PI * 2; 
+            const distance = 150 + Math.random() * 250; // Distance traveled outward
+            const targetX = Math.cos(angle) * distance;
+            const targetY = Math.sin(angle) * distance;
+            const randomRotation = -30 + Math.random() * 60; // Rotation tilt degree
+
+            video.style.setProperty('--tx', `${targetX}px`);
+            video.style.setProperty('--ty', `${targetY}px`);
+            video.style.setProperty('--rot', `${randomRotation}deg`);
+
+            document.body.appendChild(video);
+
+            // Clean element after execution window finishes
+            setTimeout(() => {
+                video.remove();
+            }, 2000);
+        }
+    });
+
+    document.getElementById("endBtn").addEventListener("click",()=>{
+        localStorage.setItem("playMusic", "true");
+        document.getElementById("endScreen").style.display = "flex";
+    });
+</script>
+
+</body>
+</html>

@@ -49,7 +49,7 @@
         /* PAGE */
         #specialPage {
             opacity: 0;
-            visibility: hidden; /* Prevents interaction before intro ends */
+            visibility: hidden;
             min-height: 100vh;
             padding: 120px 8%;
         }
@@ -76,8 +76,9 @@
         /* GRID */
         .special-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 35px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px; /* Enhanced gap between cards */
+            margin-bottom: 40px;
         }
 
         /* CARDS */
@@ -87,9 +88,11 @@
             backdrop-filter: blur(20px);
             border-radius: 30px;
             padding: 40px;
-            transition: transform 0.5s ease, box-shadow 0.5s ease;
+            cursor: pointer;
             position: relative;
             overflow: hidden;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
+                        box-shadow 0.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .special-card::before {
@@ -100,11 +103,24 @@
             background: radial-gradient(circle, rgba(236, 72, 153, .15), transparent 70%);
             top: -100px;
             right: -100px;
+            pointer-events: none;
         }
 
         .special-card:hover {
-            transform: translateY(-15px);
+            transform: translateY(-10px);
             box-shadow: 0 20px 50px rgba(236, 72, 153, .15);
+        }
+
+        .special-card.active {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 60px rgba(236, 72, 153, .25);
+            border-color: rgba(236, 72, 153, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
         .special-card span {
@@ -113,14 +129,36 @@
 
         .special-card h3 {
             color: white;
-            margin-top: 20px;
-            margin-bottom: 15px;
+            margin-bottom: 5px;
             font-size: 1.6rem;
         }
 
-        .special-card p {
+        .short-text {
             color: #cbd5e1;
-            line-height: 1.8;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        /* ACCORDION EXPANSION */
+        .expand-text {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.5s ease, opacity 0.5s ease, margin-top 0.5s ease;
+        }
+
+        .expand-text-inner {
+            padding-top: 25px;
+            color: #e2e8f0;
+            line-height: 1.9;
+            font-size: 0.95rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 20px;
+        }
+
+        .special-card.active .expand-text {
+            max-height: 500px; /* Generous height for textual breathing room */
+            opacity: 1;
         }
 
         /* CLOSING */
@@ -160,8 +198,8 @@
             background: white;
             border-radius: 50%;
             opacity: .3;
-            pointer-events: none; /* Prevents particles from stealing clicks */
-            will-change: transform; /* Enhances performance */
+            pointer-events: none;
+            will-change: transform;
             animation: floatUp linear infinite;
         }
 
@@ -182,6 +220,8 @@
 </head>
 <body>
 
+<audio id="bgMusic" src="Assets/songs/yellow.mp3" loop></audio>
+
 <div id="introScreen">
     <h1 id="introText">Every person has a story...</h1>
 </div>
@@ -192,30 +232,105 @@
         <h1>Things That Make You Amazing</h1>
     </div>
 
+    <!-- Wrapping cards inside the grid structure -->
     <div class="special-grid">
+        
+        <!-- Card 1 -->
         <div class="special-card">
-            <span>😊</span>
-            <h3>Your Smile</h3>
-            <p>The kind of smile that can brighten even the hardest days.</p>
+            <div class="card-header">
+                <span>😊</span>
+                <div>
+                    <h3>Your Smile</h3>
+                    <p class="short-text">The smile that never fails to make everything lighter.</p>
+                </div>
+            </div>
+            <div class="expand-text">
+                <div class="expand-text-inner">
+                    I don't think you even realize what your smile does. It's not about how perfect it looks—it's about how natural it feels. Whenever you smile, it somehow makes the people around you smile too. Even on days when you're probably tired or stressed, that little smile still has the power to brighten someone's mood. I honestly think it's one of the first things people remember about you, and it's definitely one of the reasons you're so unforgettable to me.
+                </div>
+            </div>
         </div>
 
+        <!-- Card 2 -->
         <div class="special-card">
-            <span>🌸</span>
-            <h3>Your Kindness</h3>
-            <p>You care about people more than you realize.</p>
+            <div class="card-header">
+                <span>🌸</span>
+                <div>
+                    <h3>Your Kindness</h3>
+                    <p class="short-text">You care about people more than you realize.</p>
+                </div>
+            </div>
+            <div class="expand-text">
+                <div class="expand-text-inner">
+                    One thing I've always admired about you is how effortlessly kind you are. You never try to prove you're a good person—you just are. Whether it's the way you talk to people, the way you listen, or the little things you do without expecting anything back, they say a lot about who you are. That's something genuinely rare.
+                </div>
+            </div>
         </div>
 
+        <!-- Card 3 -->
         <div class="special-card">
-            <span>✨</span>
-            <h3>Your Presence</h3>
-            <p>Some people make places feel warmer just by being there.</p>
+            <div class="card-header">
+                <span>✨</span>
+                <div>
+                    <h3>Your Presence</h3>
+                    <p class="short-text">Some people make places feel warmer just by being there.</p>
+                </div>
+            </div>
+            <div class="expand-text">
+                <div class="expand-text-inner">
+                    There are people who make a place louder, and then there are people who simply make it feel better by being there. You're the second kind. Even ordinary moments somehow become memorable when you're part of them. I don't know how you do it, but your presence has a calmness that's hard to explain.
+                </div>
+            </div>
         </div>
 
+        <!-- Card 4 -->
         <div class="special-card">
-            <span>💜</span>
-            <h3>Being You</h3>
-            <p>You don't need to change anything. Being yourself is enough.</p>
+            <div class="card-header">
+                <span>💖</span>
+                <div>
+                    <h3>Being You</h3>
+                    <p class="short-text">You don't need to change anything. Being yourself is enough.</p>
+                </div>
+            </div>
+            <div class="expand-text">
+                <div class="expand-text-inner">
+                    The thing I admire most isn't one specific quality—it's simply you. You don't have to pretend to be someone else or change yourself to impress people. The version of you that laughs, overthinks, smiles, gets excited, and just lives naturally is already enough. That's the version I hope never changes.
+                </div>
+            </div>
         </div>
+
+        <!-- Card 5 -->
+        <div class="special-card">
+            <div class="card-header">
+                <span>😂</span>
+                <div>
+                    <h3>Your Laugh</h3>
+                    <p class="short-text">The kind of laugh that's impossible not to smile at.</p>
+                </div>
+            </div>
+            <div class="expand-text">
+                <div class="expand-text-inner">
+                    Your laugh is honestly one of my favourite things. It's genuine, contagious, and impossible to ignore. Whenever you laugh properly, everyone around you ends up smiling too. Those little moments don't seem important at the time, but somehow they become the memories people remember the longest.
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="special-card">
+            <div class="card-header">
+                <span>🌷</span>
+                <div>
+                    <h3>Everything About You</h3>
+                    <p class="short-text">It's the way all those little pieces come together.</p>
+                </div>
+            </div>
+            <div class="expand-text">
+                <div class="expand-text-inner">
+                    If someone asked me what makes Rishmita special, I don't think I could answer with just one thing. It isn't only your smile, your kindness, or your laugh. It's the way all those little pieces come together to make you who you are. The more someone gets to know you, the more reasons they find to appreciate you. That's what makes you different.
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <div class="closing-line">
@@ -223,74 +338,65 @@
     </div>
 
     <button class="next-btn" id="memoryBtn">
-        📸 Continue To Memory Lane
+        🎬 Continue To Memory Lane
     </button>
 </section>
 
 <script>
-    /* PARTICLES GENERATOR */
+    const bgMusic = document.getElementById("bgMusic");
+
+    if (localStorage.getItem("playMusic") === "true") {
+        bgMusic.play().catch(error => {
+            console.log("Audio continuation preserved:", error);
+        });
+        localStorage.removeItem("playMusic");
+    }
+
+    /* PARTICLES */
     const particleCount = 50;
     const fragment = document.createDocumentFragment();
-    
     for (let i = 0; i < particleCount; i++) {
         const p = document.createElement("div");
         p.classList.add("particle");
         p.style.left = Math.random() * 100 + "%";
         p.style.animationDuration = (10 + Math.random() * 15) + "s";
-        p.style.animationDelay = (Math.random() * 10) + "s"; // Staggers entry
+        p.style.animationDelay = (Math.random() * 10) + "s";
         fragment.appendChild(p);
     }
     document.body.appendChild(fragment);
 
-    /* CINEMATIC INTRO TIMELINE */
+    /* GSAP ANIMATION */
     const tl = gsap.timeline();
+    tl.to("#introText", { opacity: 0, duration: 1.5, delay: 2.5 })
+      .call(() => {
+          document.getElementById("introText").innerHTML = "But some people become the most beautiful chapter.";
+      })
+      .to("#introText", { opacity: 1, duration: 1.5 })
+      .to("#introScreen", { opacity: 0, duration: 1.5, delay: 2 })
+      .set("#introScreen", { display: "none" })
+      .to("#specialPage", { opacity: 1, autoAlpha: 1, duration: 1.5 }, "-=1.5")
+      .from(".special-heading", { y: 60, opacity: 0, duration: 1.2 }, "-=0.8")
+      .from(".special-card", { y: 80, opacity: 0, stagger: 0.15, duration: 1, ease: "power3.out" }, "-=0.8");
 
-    tl.to("#introText", {
-        opacity: 0,
-        duration: 1.5,
-        delay: 2.5
-    })
-    .call(() => {
-        document.getElementById("introText").innerHTML = "But some people become the most beautiful chapter.";
-    })
-    .to("#introText", {
-        opacity: 1,
-        duration: 1.5
-    })
-    .to("#introScreen", {
-        opacity: 0,
-        duration: 1.5,
-        delay: 2
-    })
-    .set("#introScreen", { 
-        display: "none" 
-    })
-    .to("#specialPage", {
-        opacity: 1,
-        autoAlpha: 1, /* Automatically switches visibility from hidden to visible */
-        duration: 1.5
-    }, "-=1.5") /* Starts main page fade slightly early for a smooth transition */
-    .from(".special-heading", {
-        y: 60,
-        opacity: 0,
-        duration: 1.2
-    }, "-=0.8")
-    .from(".special-card", {
-        y: 80,
-        opacity: 0,
-        stagger: 0.2,
-        duration: 1,
-        ease: "power3.out"
-    }, "-=0.8");
+    /* INTERACTION LOGIC */
+    document.querySelectorAll(".special-card").forEach(card => {
+        card.addEventListener("click", () => {
+            if (card.classList.contains("active")) {
+                card.classList.remove("active");
+                return;
+            }
+            document.querySelectorAll(".special-card").forEach(c => c.classList.remove("active"));
+            card.classList.add("active");
+        });
+    });
 
-    /* NEXT PAGE TRANSITION */
     document.getElementById("memoryBtn").addEventListener("click", () => {
+        localStorage.setItem("playMusic", "true");
+        localStorage.setItem("nextSong", "true");
         gsap.to("#specialPage", {
             opacity: 0,
             duration: 1,
-            onComplete: () => {
-                window.location.href = "memory.html";
-            }
+            onComplete: () => { window.location.href = "memory.html"; }
         });
     });
 </script>

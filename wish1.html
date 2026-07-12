@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
-    <!-- GSAP CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
     <style>
@@ -24,6 +23,35 @@
             font-family: 'Poppins', sans-serif;
             background: radial-gradient(circle at center, #1b1535, #0b1020, #020617);
             height: 100vh;
+        }
+
+        /* FLOATING AUDIO CONTROLLER */
+        #audioControlContainer {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+
+        .audio-fab {
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            border: none;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;
+        }
+
+        .audio-fab:hover {
+            transform: scale(1.1) translateY(-3px);
+            box-shadow: 0 12px 30px rgba(236, 72, 153, 0.6);
         }
 
         /* INTRO */
@@ -188,6 +216,12 @@
 </head>
 <body>
 
+<audio id="wishMusic" loop></audio>
+
+<div id="audioControlContainer">
+    <button id="audioFab" class="audio-fab" title="Toggle Music">⏸️</button>
+</div>
+
 <div id="intro">
     <h1 id="introText">Close your eyes...<br><br>Make a wish...</h1>
 </div>
@@ -211,6 +245,37 @@
 </div>
 
 <script>
+    /* AUDIO CONTROLLER HANDSHAKE ARCHITECTURE */
+    const audioTrack = document.getElementById("wishMusic");
+    const audioFabBtn = document.getElementById("audioFab");
+
+    audioTrack.volume = 0.75;
+    
+    // Check if the handshake signal wants to change tracks or stay on the current one
+    if (localStorage.getItem("nextSong") === "true") {
+        // Change this path to a third song if desired, otherwise leave it on your current song path
+        audioTrack.src = "Assets/songs/Experience.mp3"; 
+        localStorage.removeItem("nextSong");
+    } else {
+        audioTrack.src = "Assets/songs/Experience.mp3";
+    }
+
+    // Initialize audio playback context seamlessly
+    if (localStorage.getItem("playMusic") === "true") {
+        audioTrack.play().catch(err => console.log("Autoplay initialization bypassed:", err));
+    }
+
+    // Toggle Play/Pause UI state
+    audioFabBtn.addEventListener("click", () => {
+        if (audioTrack.paused) {
+            audioTrack.play();
+            audioFabBtn.innerText = "⏸️";
+        } else {
+            audioTrack.pause();
+            audioFabBtn.innerText = "🎵";
+        }
+    });
+
     /* STARRY SKY GENERATION */
     const starCount = 150;
     const fragment = document.createDocumentFragment();
@@ -290,6 +355,9 @@
 
     /* NEXT PAGE MOVEMENT */
     document.getElementById("secretBtn").addEventListener("click", () => {
+        // Carry music permission over to secret2.html
+        localStorage.setItem("playMusic", "true");
+        
         gsap.to("#wishPage", {
             opacity: 0,
             duration: 0.8,
